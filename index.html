@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Онлайн-запись</title>
+    <style>
+      :root {
+        --primary-color: #6366f1;
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        padding: 16px;
+      }
+      .header {
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      .header h1 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .header p {
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+      .section {
+        background: var(--card-bg);
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .btn-select {
+        background: #f1f5f9;
+        border: 2px solid transparent;
+        padding: 12px;
+        border-radius: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-select.active {
+        border-color: var(--primary-color);
+        background: #e0e7ff;
+        color: var(--primary-color);
+      }
+      .time-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+      .btn-time {
+        background: #f1f5f9;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .btn-time.active {
+        background: var(--primary-color);
+        color: white;
+      }
+      .btn-time.disabled {
+        background: #e2e8f0;
+        color: #94a3b8;
+        cursor: not-allowed;
+        text-decoration: line-through;
+      }
+      .date-input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        font-size: 14px;
+        outline: none;
+      }
+      .btn-submit {
+        width: 100%;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1 id="salon-name">Салон красоты «Магия»</h1>
+      <p>Выберите удобное время для записи</p>
+    </div>
+
+    <!-- 1. Услуги -->
+    <div class="section">
+      <div class="section-title">1. Выберите услугу</div>
+      <div class="grid">
+        <button
+          class="btn-select option-service"
+          onclick="selectService(this, 'Маникюр')"
+        >
+          💅 Маникюр
+        </button>
+        <button
+          class="btn-select option-service"
+          onclick="selectService(this, 'Педикюр')"
+        >
+          👣 Педикюр
+        </button>
+        <button
+          class="btn-select option-service"
+          onclick="selectService(this, 'Ресницы')"
+        >
+          👁 Ресницы
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Мастера -->
+    <div class="section">
+      <div class="section-title">2. Выберите мастера</div>
+      <div class="grid">
+        <button
+          class="btn-select option-master"
+          onclick="selectMaster(this, 'Анна')"
+        >
+          👩‍🎨 Анна
+        </button>
+        <button
+          class="btn-select option-master"
+          onclick="selectMaster(this, 'Мария')"
+        >
+          👩‍⚕️ Мария
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Календарь -->
+    <div class="section">
+      <div class="section-title">3. Выберите дату</div>
+      <input
+        type="date"
+        id="appointment-date"
+        class="date-input"
+        onchange="onDateChange()"
+      />
+    </div>
+
+    <!-- 4. Время -->
+    <div class="section" id="time-section" style="display: none">
+      <div class="section-title">4. Доступное время</div>
+      <div class="time-grid" id="time-container">
+        <!-- Время будет генерироваться скриптом -->
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitBooking()">
+      Подтвердить запись
+    </button>
+
+    <script>
+      let bookingData = { service: "", master: "", date: "", time: "" };
+
+      function selectService(element, serviceName) {
+        document
+          .querySelectorAll(".option-service")
+          .forEach((b) => b.classList.remove("active"));
+        element.classList.add("active");
+        bookingData.service = serviceName;
+      }
+
+      function selectMaster(element, masterName) {
+        document
+          .querySelectorAll(".option-master")
+          .forEach((b) => b.classList.remove("active"));
+        element.classList.add("active");
+        bookingData.master = masterName;
+      }
+
+      function onDateChange() {
+        bookingData.date = document.getElementById("appointment-date").value;
+        if (bookingData.date) {
+          document.getElementById("time-section").style.display = "block";
+          renderTimeSlots();
+        }
+      }
+
+      function renderTimeSlots() {
+        const container = document.getElementById("time-container");
+        container.innerHTML = "";
+        // Шаблонные слоты времени. Позже этот список будет прилетать из бэкенда (БД)
+        const slots = [
+          { time: "10:00", free: true },
+          { time: "11:30", free: false },
+          { time: "13:00", free: true },
+          { time: "14:30", free: true },
+          { time: "16:00", free: false },
+          { time: "17:30", free: true },
+        ];
+
+        slots.forEach((slot) => {
+          const btn = document.createElement("button");
+          btn.className = `btn-time ${slot.free ? "" : "disabled"}`;
+          btn.innerText = slot.time;
+          if (slot.free) {
+            btn.onclick = () => {
+              document
+                .querySelectorAll(".btn-time")
+                .forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              bookingData.time = slot.time;
+            };
+          }
+          container.appendChild(btn);
+        });
+      }
+
+      function submitBooking() {
+        if (
+          !bookingData.service ||
+          !bookingData.master ||
+          !bookingData.date ||
+          !bookingData.time
+        ) {
+          alert("Пожалуйста, заполните все шаги записи!");
+          return;
+        }
+
+        // Логика подтверждения по ТЗ
+        const confirmAction = confirm(
+          `Подтверждаете запись?\n\n📍 ${bookingData.service}\n👤 Мастер: ${bookingData.master}\n📅 Дата: ${bookingData.date}\n⏰ Время: ${bookingData.time}`,
+        );
+
+        if (confirmAction) {
+          alert(
+            "Успешно! Данные отправлены бэкенду (время исчезнет, мастер получит пуш).",
+          );
+          // Тут будет fetch-запрос к нашему бесплатному серверу на Render
+          console.log("Отправка на бэкенд:", bookingData);
+        }
+      }
+    </script>
+  </body>
+</html>
