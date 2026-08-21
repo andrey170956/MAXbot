@@ -1,279 +1,1352 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Онлайн-запись</title>
-    <style>
-      :root {
-        --primary-color: #6366f1;
-        --bg-color: #f8fafc;
-        --card-bg: #ffffff;
-        --text-main: #0f172a;
-        --text-muted: #64748b;
-      }
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      }
-      body {
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        padding: 16px;
-      }
-      .header {
-        margin-bottom: 24px;
-        text-align: center;
-      }
-      .header h1 {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 4px;
-      }
-      .header p {
-        font-size: 14px;
-        color: var(--text-muted);
-      }
-      .section {
-        background: var(--card-bg);
-        padding: 16px;
-        border-radius: 16px;
-        margin-bottom: 16px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      }
-      .section-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 12px;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-      .btn-select {
-        background: #f1f5f9;
-        border: 2px solid transparent;
-        padding: 12px;
-        border-radius: 12px;
-        text-align: center;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .btn-select.active {
-        border-color: var(--primary-color);
-        background: #e0e7ff;
-        color: var(--primary-color);
-      }
-      .time-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-      }
-      .btn-time {
-        background: #f1f5f9;
-        border: none;
-        padding: 8px;
-        border-radius: 8px;
-        text-align: center;
-        font-size: 13px;
-        cursor: pointer;
-      }
-      .btn-time.active {
-        background: var(--primary-color);
-        color: white;
-      }
-      .btn-time.disabled {
-        background: #e2e8f0;
-        color: #94a3b8;
-        cursor: not-allowed;
-        text-decoration: line-through;
-      }
-      .date-input {
-        width: 100%;
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid #cbd5e1;
-        font-size: 14px;
-        outline: none;
-      }
-      .btn-submit {
-        width: 100%;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        padding: 16px;
-        border-radius: 14px;
-        font-size: 16px;
-        font-weight: 600;
-        margin-top: 12px;
-        cursor: pointer;
-        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <h1 id="salon-name">Салон красоты «Магия»</h1>
-      <p>Выберите удобное время для записи</p>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>[Название компании] — мини-приложение</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3EFE9;
+    --surface:#FFFFFF;
+    --surface-2:#FBF8F4;
+    --ink:#2A2420;
+    --ink-soft:#7A7067;
+    --ink-faint:#B4AA9F;
+    --line:#E7DFD4;
+    --accent:#5C3A4A;       /* deep aubergine — primary */
+    --accent-soft:#EFE1E6;  /* pale aubergine tint */
+    --accent-2:#8A9A85;     /* sage — success / available */
+    --accent-2-soft:#E7EDE3;
+    --warn:#B3542F;
+    --warn-soft:#F5E6DD;
+    --radius-lg:16px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --shadow-soft:0 1px 2px rgba(42,36,32,.04), 0 8px 24px -12px rgba(42,36,32,.18);
+    --shadow-press:0 1px 1px rgba(42,36,32,.06);
+    --font-display:'Manrope',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    font-family:var(--font-body);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    min-height:100vh;
+  }
+  button{font-family:inherit;}
+
+  /* ---------- outer shell (simulates messenger mini-app frame) ---------- */
+  .app-shell{
+    width:100%;
+    max-width:420px;
+    min-height:100vh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* ---------- dev role switcher — deliberately separated from brand UI ---------- */
+  .devbar{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 14px;
+    background:#EDE6DC;
+    border-bottom:1px dashed #D8CDBE;
+    font-family:var(--font-mono);
+  }
+  .devbar-label{
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-right:2px;
+    white-space:nowrap;
+  }
+  .devbar-tabs{
+    display:flex;
+    gap:4px;
+    background:#E2D9CB;
+    padding:3px;
+    border-radius:999px;
+    flex:1;
+  }
+  .devbar-tab{
+    flex:1;
+    border:none;
+    background:transparent;
+    color:var(--ink-soft);
+    font-size:11.5px;
+    font-weight:600;
+    padding:6px 8px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .25s ease, color .25s ease, box-shadow .25s ease;
+    font-family:var(--font-body);
+  }
+  .devbar-tab.active{
+    background:var(--ink);
+    color:#fff;
+    box-shadow:var(--shadow-press);
+  }
+
+  /* ---------- screens ---------- */
+  .screen{
+    display:none;
+    flex-direction:column;
+    flex:1;
+    animation:fadeUp .35s ease;
+  }
+  .screen.active{display:flex;}
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ---------- brand header ---------- */
+  .brand-header{
+    padding:22px 20px 18px;
+    background:linear-gradient(180deg, #FFFFFF 0%, var(--bg) 100%);
+  }
+  .brand-mark{
+    width:44px;height:44px;
+    border-radius:13px;
+    background:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:17px;
+    margin-bottom:12px;
+    box-shadow:var(--shadow-soft);
+  }
+  .brand-name{
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:21px;
+    letter-spacing:-.01em;
+    margin:0 0 3px;
+  }
+  .brand-tag{
+    margin:0;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- generic section paddings ---------- */
+  .section{padding:0 20px 20px;}
+  .section-title{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:15px;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .section-hint{
+    font-size:12px;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+
+  /* ---------- step ribbon ---------- */
+  .ribbon-wrap{padding:2px 20px 18px;}
+  .ribbon{
+    display:flex;
+    align-items:center;
+  }
+  .ribbon-seg{
+    flex:1;
+    height:4px;
+    background:var(--line);
+    border-radius:4px;
+    margin:0 3px;
+    position:relative;
+    overflow:hidden;
+  }
+  .ribbon-seg:first-child{margin-left:0;}
+  .ribbon-seg:last-child{margin-right:0;}
+  .ribbon-fill{
+    position:absolute; inset:0;
+    background:var(--accent);
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .45s cubic-bezier(.4,0,.2,1);
+    border-radius:4px;
+  }
+  .ribbon-labels{
+    display:flex;
+    justify-content:space-between;
+    margin-top:8px;
+    font-size:10px;
+    color:var(--ink-faint);
+    font-weight:600;
+    letter-spacing:.02em;
+  }
+  .ribbon-labels span.on{color:var(--accent);}
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--surface);
+    border-radius:var(--radius-lg);
+    padding:14px 16px;
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .card:active{transform:scale(.98); box-shadow:var(--shadow-press);}
+  .card.selected{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .card-icon{
+    width:44px;height:44px;
+    border-radius:12px;
+    background:var(--accent-2-soft);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+  }
+  .card.selected .card-icon{background:var(--accent);color:#fff;}
+  .card-body{flex:1; min-width:0;}
+  .card-title{font-weight:600; font-size:14.5px; margin:0 0 2px;}
+  .card-sub{font-size:12.5px; color:var(--ink-soft); margin:0;}
+  .card-chevron{color:var(--ink-faint); font-size:16px;}
+
+  .avatar-placeholder{
+    width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),#7A5265);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:var(--font-display);font-weight:700;font-size:14px;
+    flex-shrink:0;
+  }
+  .badge{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:999px;
+    background:var(--accent-2-soft);
+    color:#54634F;
+    margin-left:6px;
+  }
+
+  /* ---------- calendar ---------- */
+  .calendar-card{
+    background:var(--surface);
+    border-radius:var(--radius-lg);
+    padding:16px;
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--line);
+  }
+  .cal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .cal-month{font-family:var(--font-display); font-weight:700; font-size:14.5px; text-transform:capitalize;}
+  .cal-nav{display:flex; gap:6px;}
+  .cal-nav-btn{
+    width:30px;height:30px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface-2);
+    color:var(--ink);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+    transition:background .2s ease;
+  }
+  .cal-nav-btn:active{background:var(--line);}
+  .cal-weekdays, .cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:4px;
+  }
+  .cal-weekdays{margin-bottom:6px;}
+  .cal-weekdays span{
+    text-align:center;
+    font-size:10.5px;
+    font-weight:600;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+  }
+  .cal-day{
+    aspect-ratio:1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:11px;
+    font-size:13px;
+    font-weight:600;
+    background:transparent;
+    border:none;
+    color:var(--ink);
+    cursor:pointer;
+    position:relative;
+    transition:background .18s ease, color .18s ease, transform .12s ease;
+  }
+  .cal-day.empty{visibility:hidden; cursor:default;}
+  .cal-day.past{color:var(--ink-faint); cursor:not-allowed;}
+  .cal-day.unavailable{color:var(--ink-faint); cursor:not-allowed; text-decoration:line-through;}
+  .cal-day.available:hover{background:var(--accent-2-soft);}
+  .cal-day.available::after{
+    content:'';
+    position:absolute; bottom:4px; left:50%; transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;
+    background:var(--accent-2);
+  }
+  .cal-day.today{box-shadow:inset 0 0 0 1.5px var(--ink-faint);}
+  .cal-day.selected{
+    background:var(--accent);
+    color:#fff;
+    transform:scale(1.04);
+  }
+  .cal-day.selected::after{background:#fff;}
+  .cal-legend{
+    display:flex; gap:16px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line);
+  }
+  .cal-legend-item{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--ink-soft);}
+  .dot{width:6px;height:6px;border-radius:50%;}
+  .dot.free{background:var(--accent-2);}
+  .dot.busy{background:var(--ink-faint);}
+
+  /* ---------- time slots ---------- */
+  .slot-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .slot-btn{
+    padding:11px 6px;
+    text-align:center;
+    border-radius:var(--radius-sm);
+    border:1px solid var(--line);
+    background:var(--surface);
+    font-family:var(--font-mono);
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .16s ease;
+  }
+  .slot-btn:active{transform:scale(.96);}
+  .slot-btn.selected{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .slot-btn.taken{
+    background:var(--surface-2);
+    color:var(--ink-faint);
+    text-decoration:line-through;
+    cursor:not-allowed;
+  }
+
+  /* ---------- phone step ---------- */
+  .phone-card{
+    background:var(--surface);
+    border-radius:var(--radius-lg);
+    padding:20px 18px;
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--line);
+  }
+  .field-label{font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:8px; display:block;}
+  .phone-input{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:14px 14px;
+    font-family:var(--font-mono);
+    font-size:16px;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--surface-2);
+    outline:none;
+    transition:border-color .18s ease, background .18s ease;
+    letter-spacing:.02em;
+  }
+  .phone-input:focus{border-color:var(--accent); background:#fff;}
+  .field-hint{font-size:11.5px; color:var(--ink-faint); margin-top:8px;}
+
+  /* ---------- summary strip that appears while booking ---------- */
+  .mini-summary{
+    margin:0 20px 14px;
+    padding:12px 14px;
+    border-radius:var(--radius-md);
+    background:var(--surface);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    flex-wrap:wrap;
+  }
+  .mini-summary b{color:var(--ink); font-weight:600;}
+  .mini-summary .sep{color:var(--ink-faint);}
+
+  /* ---------- buttons ---------- */
+  .btn-row{padding:6px 20px 24px; margin-top:auto;}
+  .btn-primary{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:var(--radius-md);
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    font-size:14.5px;
+    cursor:pointer;
+    box-shadow:0 10px 20px -8px rgba(92,58,74,.55);
+    transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+  .btn-primary:active{transform:scale(.985);}
+  .btn-primary:disabled{
+    opacity:.4;
+    box-shadow:none;
+    cursor:not-allowed;
+  }
+  .btn-ghost{
+    width:100%;
+    padding:13px;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius-md);
+    background:transparent;
+    color:var(--ink-soft);
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+    margin-top:8px;
+    transition:background .15s ease;
+  }
+  .btn-ghost:active{background:var(--surface-2);}
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    border:none;
+    background:none;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    padding:0 20px;
+    margin-bottom:6px;
+  }
+
+  /* ---------- success state ---------- */
+  .success-wrap{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px 28px;
+  }
+  .success-icon{
+    width:64px;height:64px;
+    border-radius:50%;
+    background:var(--accent-2-soft);
+    color:var(--accent-2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;
+    margin-bottom:18px;
+    animation:pop .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop{from{transform:scale(.6); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .success-title{font-family:var(--font-display); font-weight:800; font-size:18px; margin:0 0 6px;}
+  .success-text{font-size:13px; color:var(--ink-soft); margin:0 0 24px; line-height:1.5;}
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(42,36,32,.42);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+    backdrop-filter:blur(2px);
+  }
+  .modal-overlay.active{display:flex; animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
+  .modal-sheet{
+    width:100%;
+    max-width:420px;
+    background:var(--surface);
+    border-radius:22px 22px 0 0;
+    padding:22px 20px 26px;
+    box-shadow:0 -12px 40px rgba(0,0,0,.18);
+    animation:slideUp .32s cubic-bezier(.34,1.1,.64,1);
+  }
+  @keyframes slideUp{from{transform:translateY(100%);} to{transform:translateY(0);}}
+  .modal-handle{
+    width:36px;height:4px;border-radius:4px;
+    background:var(--line);
+    margin:0 auto 18px;
+  }
+  .modal-title{font-family:var(--font-display); font-weight:800; font-size:17px; margin:0 0 4px;}
+  .modal-sub{font-size:12.5px; color:var(--ink-soft); margin:0 0 18px;}
+  .modal-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .modal-row:last-of-type{border-bottom:none;}
+  .modal-row-label{color:var(--ink-soft);}
+  .modal-row-val{font-weight:600; text-align:right;}
+
+  /* ---------- auth gates (master/admin) ---------- */
+  .gate-wrap{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:28px 24px;
+    transition:opacity .3s ease;
+  }
+  .gate-icon{
+    width:52px;height:52px;
+    border-radius:14px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    margin-bottom:16px;
+  }
+  .gate-title{font-family:var(--font-display); font-weight:800; font-size:19px; margin:0 0 6px;}
+  .gate-text{font-size:13px; color:var(--ink-soft); margin:0 0 22px; line-height:1.5;}
+  .gate-input{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:14px;
+    font-family:var(--font-mono);
+    font-size:15px;
+    letter-spacing:.06em;
+    background:var(--surface-2);
+    outline:none;
+    margin-bottom:10px;
+    transition:border-color .18s ease;
+  }
+  .gate-input:focus{border-color:var(--accent); background:#fff;}
+  .gate-error{
+    font-size:12px;
+    color:var(--warn);
+    min-height:16px;
+    margin:-2px 0 10px;
+    font-weight:600;
+  }
+
+  /* ---------- master dashboard ---------- */
+  .dash-header{
+    padding:20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .dash-hello{font-family:var(--font-display); font-weight:800; font-size:18px; margin:0;}
+  .dash-role{font-size:12px; color:var(--ink-soft); margin:2px 0 0;}
+  .logout-btn{
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    background:var(--surface);
+    border:1px solid var(--line);
+    padding:7px 12px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .appt-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:12px 14px;
+    margin-bottom:8px;
+  }
+  .appt-time{
+    font-family:var(--font-mono);
+    font-weight:700;
+    font-size:13.5px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    padding:6px 9px;
+    border-radius:9px;
+    flex-shrink:0;
+  }
+  .appt-body{flex:1; min-width:0;}
+  .appt-service{font-weight:600; font-size:13.5px; margin:0 0 2px;}
+  .appt-client{font-size:12px; color:var(--ink-soft); margin:0; font-family:var(--font-mono);}
+
+  /* ---------- admin dashboard ---------- */
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    padding:0 20px 18px;
+  }
+  .stat-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:12px 10px;
+    text-align:center;
+  }
+  .stat-num{font-family:var(--font-display); font-weight:800; font-size:18px; margin:0;}
+  .stat-label{font-size:10px; color:var(--ink-faint); margin:3px 0 0; font-weight:600; text-transform:uppercase; letter-spacing:.03em;}
+
+  .broadcast-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:18px 16px;
+    box-shadow:var(--shadow-soft);
+  }
+  .broadcast-textarea{
+    width:100%;
+    min-height:96px;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:12px 13px;
+    font-family:var(--font-body);
+    font-size:13.5px;
+    color:var(--ink);
+    background:var(--surface-2);
+    outline:none;
+    resize:vertical;
+    line-height:1.5;
+    transition:border-color .18s ease;
+  }
+  .broadcast-textarea:focus{border-color:var(--accent); background:#fff;}
+  .broadcast-count{
+    text-align:right;
+    font-size:11px;
+    color:var(--ink-faint);
+    margin:6px 0 14px;
+  }
+  .btn-broadcast{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:var(--radius-md);
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    box-shadow:0 10px 20px -8px rgba(92,58,74,.5);
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .btn-broadcast:active{transform:scale(.985);}
+  .btn-broadcast:disabled{opacity:.5; cursor:not-allowed;}
+  .spinner{
+    width:15px;height:15px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color:#fff;
+    animation:spin .7s linear infinite;
+    display:none;
+  }
+  .spinner.on{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:-80px;
+    transform:translateX(-50%);
+    background:var(--ink);
+    color:#fff;
+    padding:13px 18px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+    transition:bottom .4s cubic-bezier(.34,1.2,.64,1);
+    z-index:60;
+    white-space:nowrap;
+  }
+  .toast.show{bottom:24px;}
+  .toast .dot.free{background:var(--accent-2);}
+
+  ::selection{background:var(--accent-soft);}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===================== DEV ROLE SWITCHER ===================== -->
+  <div class="devbar">
+    <span class="devbar-label">Роль:</span>
+    <div class="devbar-tabs">
+      <button class="devbar-tab active" data-role="client" onclick="switchRole('client')">Клиент</button>
+      <button class="devbar-tab" data-role="master" onclick="switchRole('master')">Мастер</button>
+      <button class="devbar-tab" data-role="admin" onclick="switchRole('admin')">Админ</button>
+    </div>
+  </div>
+
+  <!-- ===================== CLIENT SCREEN ===================== -->
+  <div class="screen active" id="screen-client">
+
+    <div class="brand-header">
+      <div class="brand-mark">Л</div>
+      <h1 class="brand-name">[Название компании]</h1>
+      <p class="brand-tag">[Слоган / Описание компании]</p>
     </div>
 
-    <!-- 1. Услуги -->
-    <div class="section">
-      <div class="section-title">1. Выберите услугу</div>
-      <div class="grid">
-        <button
-          class="btn-select option-service"
-          onclick="selectService(this, 'Маникюр')"
-        >
-          💅 Маникюр
-        </button>
-        <button
-          class="btn-select option-service"
-          onclick="selectService(this, 'Педикюр')"
-        >
-          👣 Педикюр
-        </button>
-        <button
-          class="btn-select option-service"
-          onclick="selectService(this, 'Ресницы')"
-        >
-          👁 Ресницы
-        </button>
+    <div class="ribbon-wrap">
+      <div class="ribbon" id="ribbon">
+        <div class="ribbon-seg"><div class="ribbon-fill"></div></div>
+        <div class="ribbon-seg"><div class="ribbon-fill"></div></div>
+        <div class="ribbon-seg"><div class="ribbon-fill"></div></div>
+        <div class="ribbon-seg"><div class="ribbon-fill"></div></div>
+        <div class="ribbon-seg"><div class="ribbon-fill"></div></div>
+      </div>
+      <div class="ribbon-labels">
+        <span id="lbl1">Услуга</span>
+        <span id="lbl2">Мастер</span>
+        <span id="lbl3">Дата</span>
+        <span id="lbl4">Время</span>
+        <span id="lbl5">Контакт</span>
       </div>
     </div>
 
-    <!-- 2. Мастера -->
-    <div class="section">
-      <div class="section-title">2. Выберите мастера</div>
-      <div class="grid">
-        <button
-          class="btn-select option-master"
-          onclick="selectMaster(this, 'Анна')"
-        >
-          👩‍🎨 Анна
-        </button>
-        <button
-          class="btn-select option-master"
-          onclick="selectMaster(this, 'Мария')"
-        >
-          👩‍⚕️ Мария
-        </button>
+    <div id="clientMiniSummary"></div>
+
+    <button class="back-btn" id="clientBackBtn" onclick="clientBack()" style="visibility:hidden;">&larr; Назад</button>
+
+    <div class="section" id="clientStepArea" style="flex:1;"></div>
+
+    <div class="btn-row" id="clientBtnRow"></div>
+  </div>
+
+  <!-- ===================== MASTER SCREEN ===================== -->
+  <div class="screen" id="screen-master">
+
+    <!-- Gate -->
+    <div class="gate-wrap" id="masterGate">
+      <div class="gate-icon">🔑</div>
+      <h2 class="gate-title">Кабинет мастера</h2>
+      <p class="gate-text">Введите инвайт-код сотрудника, чтобы открыть личный кабинет и расписание на сегодня.</p>
+      <label class="field-label">Инвайт-код сотрудника</label>
+      <input class="gate-input" id="masterCode" placeholder="•••• ••••" maxlength="20" autocomplete="off">
+      <div class="gate-error" id="masterError"></div>
+      <button class="btn-primary" onclick="checkMasterCode()">Войти в кабинет</button>
+      <p class="field-hint" style="text-align:center; margin-top:14px;">Тестовый код: <b>MASTER123</b></p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="masterDash" style="display:none; flex:1; flex-direction:column;">
+      <div class="dash-header">
+        <div>
+          <p class="dash-hello">Привет, [Мастер] 👋</p>
+          <p class="dash-role">Расписание на сегодня</p>
+        </div>
+        <button class="logout-btn" onclick="masterLogout()">Выйти</button>
+      </div>
+      <div class="section" id="masterAppts" style="flex:1;"></div>
+    </div>
+  </div>
+
+  <!-- ===================== ADMIN SCREEN ===================== -->
+  <div class="screen" id="screen-admin">
+
+    <!-- Gate -->
+    <div class="gate-wrap" id="adminGate">
+      <div class="gate-icon">🛡️</div>
+      <h2 class="gate-title">Панель администратора</h2>
+      <p class="gate-text">Введите мастер-пароль салона, чтобы открыть панель управления и маркетинг.</p>
+      <label class="field-label">Мастер-пароль салона</label>
+      <input class="gate-input" id="adminCode" type="password" placeholder="••••••••" autocomplete="off">
+      <div class="gate-error" id="adminError"></div>
+      <button class="btn-primary" onclick="checkAdminCode()">Войти в панель</button>
+      <p class="field-hint" style="text-align:center; margin-top:14px;">Тестовый пароль: <b>ADMIN777</b></p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="adminDash" style="display:none; flex:1; flex-direction:column;">
+      <div class="dash-header">
+        <div>
+          <p class="dash-hello">Панель управления</p>
+          <p class="dash-role">[Название компании]</p>
+        </div>
+        <button class="logout-btn" onclick="adminLogout()">Выйти</button>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card"><p class="stat-num">12</p><p class="stat-label">Записей сегодня</p></div>
+        <div class="stat-card"><p class="stat-num">83%</p><p class="stat-label">Загрузка</p></div>
+        <div class="stat-card"><p class="stat-num">4.9</p><p class="stat-label">Рейтинг</p></div>
+      </div>
+
+      <div class="section" style="flex:1;">
+        <h3 class="section-title">Маркетинг и рассылки</h3>
+        <div class="broadcast-card">
+          <label class="field-label">Сообщение для клиентов</label>
+          <textarea class="broadcast-textarea" id="broadcastText" maxlength="300" placeholder="Например: «На этой неделе — скидка 15% на [Услугу 1]. Успейте записаться!»" oninput="updateBroadcastCount()"></textarea>
+          <div class="broadcast-count"><span id="broadcastCount">0</span>/300</div>
+          <button class="btn-broadcast" id="broadcastBtn" onclick="sendBroadcast()">
+            <span class="spinner" id="broadcastSpinner"></span>
+            <span id="broadcastBtnText">Запустить массовую рассылку клиентам через мессенджер</span>
+          </button>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- 3. Календарь -->
-    <div class="section">
-      <div class="section-title">3. Выберите дату</div>
-      <input
-        type="date"
-        id="appointment-date"
-        class="date-input"
-        onchange="onDateChange()"
-      />
-    </div>
+</div>
 
-    <!-- 4. Время -->
-    <div class="section" id="time-section" style="display: none">
-      <div class="section-title">4. Доступное время</div>
-      <div class="time-grid" id="time-container">
-        <!-- Время будет генерироваться скриптом -->
+<!-- ===================== CONFIRM MODAL ===================== -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Подтвердите запись</h3>
+    <p class="modal-sub">Проверьте детали — после подтверждения слот будет закреплён за вами.</p>
+    <div id="modalDetails"></div>
+    <button class="btn-primary" style="margin-top:18px;" onclick="confirmBooking()">Подтвердить запись</button>
+    <button class="btn-ghost" onclick="closeModal()">Отмена</button>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   ЗАГЛУШКИ ДАННЫХ (White Label — заменяются бэкендом)
+   ============================================================ */
+const SERVICES = [
+  { id:'s1', icon:'✂️', name:'[Услуга 1]', sub:'[Параметры/Цена]' },
+  { id:'s2', icon:'💇', name:'[Услуга 2]', sub:'[Параметры/Цена]' },
+  { id:'s3', icon:'💅', name:'[Услуга 3]', sub:'[Параметры/Цена]' },
+  { id:'s4', icon:'✨', name:'[Услуга 4]', sub:'[Параметры/Цена]' },
+  { id:'s5', icon:'🧖', name:'[Услуга 5]', sub:'[Параметры/Цена]' },
+];
+
+const MASTERS = [
+  { id:'m1', initials:'М1', name:'[Мастер 1]', sub:'[Квалификация]' },
+  { id:'m2', initials:'М2', name:'[Мастер 2]', sub:'[Квалификация]' },
+  { id:'m3', initials:'М3', name:'[Мастер 3]', sub:'[Квалификация]' },
+  { id:'m4', initials:'М4', name:'[Мастер 4]', sub:'[Квалификация]' },
+];
+
+const MASTER_APPTS = [
+  { time:'10:00', service:'[Услуга 1]', client:'Клиент И.***', phone:'+7 9** *** ** 12' },
+  { time:'11:30', service:'[Услуга 3]', client:'Клиент А.***', phone:'+7 9** *** ** 47' },
+  { time:'13:00', service:'[Услуга 2]', client:'Клиент С.***', phone:'+7 9** *** ** 89' },
+  { time:'15:30', service:'[Услуга 5]', client:'Клиент Е.***', phone:'+7 9** *** ** 23' },
+];
+
+const STEP_NAMES = ['lbl1','lbl2','lbl3','lbl4','lbl5'];
+
+/* ============================================================
+   СОСТОЯНИЕ БРОНИРОВАНИЯ (Client FSM)
+   ============================================================ */
+let booking = { step:1, service:null, master:null, date:null, dateLabel:null, time:null, phone:'' };
+let calendarViewMonth = new Date().getMonth();
+let calendarViewYear = new Date().getFullYear();
+let unavailableDates = new Set();   // populated per rendered month
+let bookedSlots = new Set();        // "YYYY-MM-DD_HH:MM" taken slots
+
+function log(action, payload){
+  // TODO: backend integration point — replace console.log with real fetch() call to Python API
+  console.log('%c[API CALL]', 'color:#5C3A4A;font-weight:bold;', action, payload || '');
+}
+
+/* ---------------- role switching ---------------- */
+function switchRole(role){
+  document.querySelectorAll('.devbar-tab').forEach(t=>t.classList.toggle('active', t.dataset.role===role));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+role).classList.add('active');
+  log('role_switched', { role });
+}
+
+/* ---------------- ribbon progress ---------------- */
+function updateRibbon(){
+  const fills = document.querySelectorAll('.ribbon-fill');
+  fills.forEach((f,i)=>{ f.style.transform = i < booking.step ? 'scaleX(1)' : 'scaleX(0)'; });
+  STEP_NAMES.forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('on', i < booking.step);
+  });
+}
+
+/* ---------------- mini summary strip ---------------- */
+function renderMiniSummary(){
+  const el = document.getElementById('clientMiniSummary');
+  const parts = [];
+  if(booking.service) parts.push('<b>'+booking.service.name+'</b>');
+  if(booking.master) parts.push('<b>'+booking.master.name+'</b>');
+  if(booking.dateLabel) parts.push('<b>'+booking.dateLabel+'</b>');
+  if(booking.time) parts.push('<b>'+booking.time+'</b>');
+  if(!parts.length){ el.innerHTML=''; return; }
+  el.innerHTML = '<div class="mini-summary">'+parts.join(' <span class="sep">&middot;</span> ')+'</div>';
+}
+
+/* ---------------- navigation ---------------- */
+function clientBack(){
+  if(booking.step>1){
+    booking.step -= 1;
+    renderClientStep();
+  }
+}
+function goToStep(n){
+  booking.step = n;
+  renderClientStep();
+}
+
+function renderClientStep(){
+  updateRibbon();
+  renderMiniSummary();
+  document.getElementById('clientBackBtn').style.visibility = booking.step>1 ? 'visible' : 'hidden';
+  const area = document.getElementById('clientStepArea');
+  const btnRow = document.getElementById('clientBtnRow');
+  btnRow.innerHTML = '';
+
+  if(booking.step===1) renderStepService(area, btnRow);
+  else if(booking.step===2) renderStepMaster(area, btnRow);
+  else if(booking.step===3) renderStepDate(area, btnRow);
+  else if(booking.step===4) renderStepTime(area, btnRow);
+  else if(booking.step===5) renderStepPhone(area, btnRow);
+}
+
+/* ---------------- Step 1 : услуга ---------------- */
+function renderStepService(area, btnRow){
+  area.innerHTML = `
+    <h3 class="section-title">Выберите услугу <span class="section-hint">Шаг 1 из 5</span></h3>
+    <div id="serviceList"></div>`;
+  const list = document.getElementById('serviceList');
+  SERVICES.forEach(s=>{
+    const card = document.createElement('div');
+    card.className = 'card' + (booking.service?.id===s.id ? ' selected' : '');
+    card.innerHTML = `
+      <div class="card-icon">${s.icon}</div>
+      <div class="card-body">
+        <p class="card-title">${s.name}</p>
+        <p class="card-sub">${s.sub}</p>
       </div>
-    </div>
+      <div class="card-chevron">›</div>`;
+    card.onclick = ()=>{
+      booking.service = s;
+      log('service_selected', s);
+      goToStep(2);
+    };
+    list.appendChild(card);
+  });
+}
 
-    <button class="btn-submit" onclick="submitBooking()">
-      Подтвердить запись
-    </button>
+/* ---------------- Step 2 : мастер ---------------- */
+function renderStepMaster(area, btnRow){
+  area.innerHTML = `
+    <h3 class="section-title">Выберите специалиста <span class="section-hint">Шаг 2 из 5</span></h3>
+    <div id="masterList"></div>`;
+  const list = document.getElementById('masterList');
+  MASTERS.forEach(m=>{
+    const card = document.createElement('div');
+    card.className = 'card' + (booking.master?.id===m.id ? ' selected' : '');
+    card.innerHTML = `
+      <div class="avatar-placeholder">${m.initials}</div>
+      <div class="card-body">
+        <p class="card-title">${m.name}</p>
+        <p class="card-sub">${m.sub}</p>
+      </div>
+      <div class="card-chevron">›</div>`;
+    card.onclick = ()=>{
+      booking.master = m;
+      log('master_selected', m);
+      goToStep(3);
+    };
+    list.appendChild(card);
+  });
+}
 
-    <script>
-      let bookingData = { service: "", master: "", date: "", time: "" };
+/* ---------------- Step 3 : дата (кастомный календарь) ---------------- */
+const MONTHS_RU = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONTHS_RU_NOM = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const WEEKDAYS_RU = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 
-      function selectService(element, serviceName) {
-        document
-          .querySelectorAll(".option-service")
-          .forEach((b) => b.classList.remove("active"));
-        element.classList.add("active");
-        bookingData.service = serviceName;
-      }
+function seedRandomForMonth(y,m){
+  // deterministic-ish pseudo random per rendered month, purely for demo "занятости"
+  unavailableDates = new Set();
+  const days = new Date(y, m+1, 0).getDate();
+  for(let d=1; d<=days; d++){
+    if(Math.random() < 0.22){
+      unavailableDates.add(d);
+    }
+  }
+}
 
-      function selectMaster(element, masterName) {
-        document
-          .querySelectorAll(".option-master")
-          .forEach((b) => b.classList.remove("active"));
-        element.classList.add("active");
-        bookingData.master = masterName;
-      }
+function renderStepDate(area, btnRow){
+  area.innerHTML = `
+    <h3 class="section-title">Выберите дату <span class="section-hint">Шаг 3 из 5</span></h3>
+    <div class="calendar-card">
+      <div class="cal-head">
+        <button class="cal-nav-btn" onclick="calShiftMonth(-1)">‹</button>
+        <span class="cal-month" id="calMonthLabel"></span>
+        <button class="cal-nav-btn" onclick="calShiftMonth(1)">›</button>
+      </div>
+      <div class="cal-weekdays">${WEEKDAYS_RU.map(w=>'<span>'+w+'</span>').join('')}</div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><span class="dot free"></span>Есть места</div>
+        <div class="cal-legend-item"><span class="dot busy"></span>Нет мест</div>
+      </div>
+    </div>`;
+  buildCalendar();
+}
 
-      function onDateChange() {
-        bookingData.date = document.getElementById("appointment-date").value;
-        if (bookingData.date) {
-          document.getElementById("time-section").style.display = "block";
-          renderTimeSlots();
-        }
-      }
+function calShiftMonth(delta){
+  calendarViewMonth += delta;
+  if(calendarViewMonth<0){ calendarViewMonth=11; calendarViewYear--; }
+  if(calendarViewMonth>11){ calendarViewMonth=0; calendarViewYear++; }
+  buildCalendar();
+}
 
-      function renderTimeSlots() {
-        const container = document.getElementById("time-container");
-        container.innerHTML = "";
-        // Шаблонные слоты времени. Позже этот список будет прилетать из бэкенда (БД)
-        const slots = [
-          { time: "10:00", free: true },
-          { time: "11:30", free: false },
-          { time: "13:00", free: true },
-          { time: "14:30", free: true },
-          { time: "16:00", free: false },
-          { time: "17:30", free: true },
-        ];
+function buildCalendar(){
+  seedRandomForMonth(calendarViewYear, calendarViewMonth);
+  document.getElementById('calMonthLabel').textContent = MONTHS_RU_NOM[calendarViewMonth] + ' ' + calendarViewYear;
 
-        slots.forEach((slot) => {
-          const btn = document.createElement("button");
-          btn.className = `btn-time ${slot.free ? "" : "disabled"}`;
-          btn.innerText = slot.time;
-          if (slot.free) {
-            btn.onclick = () => {
-              document
-                .querySelectorAll(".btn-time")
-                .forEach((b) => b.classList.remove("active"));
-              btn.classList.add("active");
-              bookingData.time = slot.time;
-            };
-          }
-          container.appendChild(btn);
-        });
-      }
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
 
-      function submitBooking() {
-        if (
-          !bookingData.service ||
-          !bookingData.master ||
-          !bookingData.date ||
-          !bookingData.time
-        ) {
-          alert("Пожалуйста, заполните все шаги записи!");
-          return;
-        }
+  const firstDay = new Date(calendarViewYear, calendarViewMonth, 1);
+  let startOffset = firstDay.getDay() - 1; // Monday-start
+  if(startOffset < 0) startOffset = 6;
 
-        // Логика подтверждения по ТЗ
-        const confirmAction = confirm(
-          `Подтверждаете запись?\n\n📍 ${bookingData.service}\n👤 Мастер: ${bookingData.master}\n📅 Дата: ${bookingData.date}\n⏰ Время: ${bookingData.time}`,
-        );
+  const daysInMonth = new Date(calendarViewYear, calendarViewMonth+1, 0).getDate();
+  const today = new Date();
+  today.setHours(0,0,0,0);
 
-        if (confirmAction) {
-          alert(
-            "Успешно! Данные отправлены бэкенду (время исчезнет, мастер получит пуш).",
-          );
-          // Тут будет fetch-запрос к нашему бесплатному серверу на Render
-          console.log("Отправка на бэкенд:", bookingData);
-        }
-      }
-    </script>
-  </body>
+  for(let i=0;i<startOffset;i++){
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
+  }
+
+  for(let d=1; d<=daysInMonth; d++){
+    const btn = document.createElement('button');
+    const cellDate = new Date(calendarViewYear, calendarViewMonth, d);
+    cellDate.setHours(0,0,0,0);
+    const isPast = cellDate < today;
+    const isToday = cellDate.getTime() === today.getTime();
+    const isUnavailable = unavailableDates.has(d) && !isPast;
+
+    let cls = 'cal-day';
+    if(isPast) cls += ' past';
+    else if(isUnavailable) cls += ' unavailable';
+    else cls += ' available';
+    if(isToday) cls += ' today';
+
+    const isSelected = booking.date &&
+      booking.date.getFullYear()===calendarViewYear &&
+      booking.date.getMonth()===calendarViewMonth &&
+      booking.date.getDate()===d;
+    if(isSelected) cls += ' selected';
+
+    btn.className = cls;
+    btn.textContent = d;
+
+    if(!isPast && !isUnavailable){
+      btn.onclick = ()=>{
+        booking.date = new Date(calendarViewYear, calendarViewMonth, d);
+        booking.dateLabel = d + ' ' + MONTHS_RU[calendarViewMonth];
+        log('date_selected', booking.dateLabel);
+        goToStep(4);
+      };
+    }
+    grid.appendChild(btn);
+  }
+}
+
+/* ---------------- Step 4 : время ---------------- */
+function buildSlotsForDate(){
+  const slots = [];
+  for(let h=9; h<19; h++){
+    slots.push(String(h).padStart(2,'0')+':00');
+    slots.push(String(h).padStart(2,'0')+':30');
+  }
+  return slots;
+}
+
+function slotKey(time){
+  const d = booking.date;
+  const ds = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  return ds+'_'+time;
+}
+
+function renderStepTime(area, btnRow){
+  const slots = buildSlotsForDate();
+  // seed a few pseudo-random "taken" slots per date on first render
+  const dateSig = slotKey('SEED');
+  if(!window._seededDates) window._seededDates = new Set();
+  if(!window._seededDates.has(dateSig)){
+    window._seededDates.add(dateSig);
+    slots.forEach(t=>{ if(Math.random()<0.35) bookedSlots.add(slotKey(t)); });
+  }
+
+  area.innerHTML = `
+    <h3 class="section-title">Выберите время <span class="section-hint">Шаг 4 из 5</span></h3>
+    <p class="card-sub" style="margin:-6px 0 14px;">${booking.dateLabel}, к ${booking.master.name}</p>
+    <div class="slot-grid" id="slotGrid"></div>`;
+
+  const grid = document.getElementById('slotGrid');
+  slots.forEach(t=>{
+    const taken = bookedSlots.has(slotKey(t));
+    const btn = document.createElement('button');
+    btn.className = 'slot-btn' + (taken ? ' taken' : '') + (booking.time===t ? ' selected' : '');
+    btn.textContent = t;
+    if(!taken){
+      btn.onclick = ()=>{
+        booking.time = t;
+        log('time_selected', t);
+        goToStep(5);
+      };
+    }
+    grid.appendChild(btn);
+  });
+}
+
+/* ---------------- Step 5 : телефон ---------------- */
+function formatPhone(raw){
+  let digits = raw.replace(/\D/g,'');
+  if(digits.startsWith('8')) digits = '7'+digits.slice(1);
+  if(!digits.startsWith('7')) digits = '7'+digits;
+  digits = digits.slice(0,11);
+  let out = '+7';
+  const rest = digits.slice(1);
+  if(rest.length>0) out += ' (' + rest.slice(0,3);
+  if(rest.length>=3) out += ') ' + rest.slice(3,6);
+  if(rest.length>=6) out += '-' + rest.slice(6,8);
+  if(rest.length>=8) out += '-' + rest.slice(8,10);
+  return out;
+}
+
+function renderStepPhone(area, btnRow){
+  area.innerHTML = `
+    <h3 class="section-title">Контактный телефон <span class="section-hint">Шаг 5 из 5</span></h3>
+    <div class="phone-card">
+      <span class="field-label">Номер телефона</span>
+      <input class="phone-input" id="phoneInput" placeholder="+7 (___) ___-__-__" inputmode="tel" value="${booking.phone||''}">
+      <p class="field-hint">Нужен, чтобы мастер мог связаться с вами перед визитом.</p>
+    </div>`;
+
+  const input = document.getElementById('phoneInput');
+  input.addEventListener('input', ()=>{
+    const formatted = formatPhone(input.value);
+    input.value = formatted;
+    booking.phone = formatted;
+    updatePhoneBtn();
+  });
+  if(booking.phone) input.value = formatPhone(booking.phone);
+
+  btnRow.innerHTML = `<button class="btn-primary" id="phoneContinueBtn" disabled onclick="openConfirmModal()">Подтвердить запись</button>`;
+  updatePhoneBtn();
+}
+
+function updatePhoneBtn(){
+  const btn = document.getElementById('phoneContinueBtn');
+  if(!btn) return;
+  const digits = (booking.phone||'').replace(/\D/g,'');
+  btn.disabled = digits.length < 11;
+}
+
+/* ---------------- модалка подтверждения ---------------- */
+function openConfirmModal(){
+  const rows = [
+    ['Услуга', booking.service.name],
+    ['Мастер', booking.master.name],
+    ['Дата', booking.dateLabel],
+    ['Время', booking.time],
+    ['Телефон', booking.phone],
+  ];
+  document.getElementById('modalDetails').innerHTML = rows.map(([l,v])=>
+    `<div class="modal-row"><span class="modal-row-label">${l}</span><span class="modal-row-val">${v}</span></div>`
+  ).join('');
+  document.getElementById('confirmModal').classList.add('active');
+  log('confirm_modal_opened', booking);
+}
+function closeModal(){
+  document.getElementById('confirmModal').classList.remove('active');
+}
+
+function confirmBooking(){
+  bookedSlots.add(slotKey(booking.time)); // "БД" блокирует слот
+  log('booking_confirmed', booking);
+  closeModal();
+  showBookingSuccess();
+}
+
+function showBookingSuccess(){
+  const area = document.getElementById('clientStepArea');
+  const btnRow = document.getElementById('clientBtnRow');
+  document.getElementById('clientBackBtn').style.visibility = 'hidden';
+  document.getElementById('clientMiniSummary').innerHTML = '';
+  updateRibbonComplete();
+
+  area.innerHTML = `
+    <div class="success-wrap">
+      <div class="success-icon">✓</div>
+      <h3 class="success-title">Запись подтверждена</h3>
+      <p class="success-text">
+        ${booking.dateLabel} в ${booking.time}<br>
+        ${booking.service.name} &middot; ${booking.master.name}<br>
+        Мы напишем вам на ${booking.phone} за час до визита.
+      </p>
+    </div>`;
+  btnRow.innerHTML = `<button class="btn-primary" onclick="resetBooking()">Записаться ещё раз</button>`;
+}
+
+function updateRibbonComplete(){
+  document.querySelectorAll('.ribbon-fill').forEach(f=> f.style.transform='scaleX(1)');
+  STEP_NAMES.forEach(id=> document.getElementById(id).classList.add('on'));
+}
+
+function resetBooking(){
+  booking = { step:1, service:null, master:null, date:null, dateLabel:null, time:null, phone:'' };
+  renderClientStep();
+}
+
+/* ============================================================
+   МАСТЕР — вход по инвайт-коду
+   ============================================================ */
+function checkMasterCode(){
+  const val = document.getElementById('masterCode').value.trim();
+  const err = document.getElementById('masterError');
+  if(val === 'MASTER123'){
+    err.textContent = '';
+    log('master_login_success');
+    document.getElementById('masterGate').style.opacity = '0';
+    setTimeout(()=>{
+      document.getElementById('masterGate').style.display = 'none';
+      document.getElementById('masterDash').style.display = 'flex';
+      renderMasterAppts();
+    }, 200);
+  } else {
+    err.textContent = 'Неверный инвайт-код. Попробуйте ещё раз.';
+    log('master_login_failed', val);
+  }
+}
+function renderMasterAppts(){
+  const wrap = document.getElementById('masterAppts');
+  wrap.innerHTML = '<h3 class="section-title">Сегодня, ' + new Date().toLocaleDateString('ru-RU', {day:'numeric', month:'long'}) + '</h3>';
+  MASTER_APPTS.forEach(a=>{
+    const row = document.createElement('div');
+    row.className = 'appt-row';
+    row.innerHTML = `
+      <div class="appt-time">${a.time}</div>
+      <div class="appt-body">
+        <p class="appt-service">${a.service}</p>
+        <p class="appt-client">${a.client} &middot; ${a.phone}</p>
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+function masterLogout(){
+  document.getElementById('masterDash').style.display = 'none';
+  document.getElementById('masterGate').style.display = 'flex';
+  document.getElementById('masterGate').style.opacity = '1';
+  document.getElementById('masterCode').value = '';
+  document.getElementById('masterError').textContent = '';
+  log('master_logout');
+}
+
+/* ============================================================
+   АДМИН — вход по мастер-паролю
+   ============================================================ */
+function checkAdminCode(){
+  const val = document.getElementById('adminCode').value.trim();
+  const err = document.getElementById('adminError');
+  if(val === 'ADMIN777'){
+    err.textContent = '';
+    log('admin_login_success');
+    document.getElementById('adminGate').style.opacity = '0';
+    setTimeout(()=>{
+      document.getElementById('adminGate').style.display = 'none';
+      document.getElementById('adminDash').style.display = 'flex';
+    }, 200);
+  } else {
+    err.textContent = 'Неверный пароль. Попробуйте ещё раз.';
+    log('admin_login_failed', val);
+  }
+}
+function adminLogout(){
+  document.getElementById('adminDash').style.display = 'none';
+  document.getElementById('adminGate').style.display = 'flex';
+  document.getElementById('adminGate').style.opacity = '1';
+  document.getElementById('adminCode').value = '';
+  document.getElementById('adminError').textContent = '';
+  log('admin_logout');
+}
+
+function updateBroadcastCount(){
+  const ta = document.getElementById('broadcastText');
+  document.getElementById('broadcastCount').textContent = ta.value.length;
+}
+
+function sendBroadcast(){
+  const text = document.getElementById('broadcastText').value.trim();
+  if(!text) return;
+  const btn = document.getElementById('broadcastBtn');
+  const spinner = document.getElementById('broadcastSpinner');
+  const label = document.getElementById('broadcastBtnText');
+
+  btn.disabled = true;
+  spinner.classList.add('on');
+  label.textContent = 'Отправляем...';
+  log('broadcast_sending', { text });
+
+  setTimeout(()=>{
+    spinner.classList.remove('on');
+    label.textContent = 'Запустить массовую рассылку клиентам через мессенджер';
+    btn.disabled = false;
+    log('broadcast_sent', { text, recipients: '~[N] клиентов' });
+    showToast('Успешно отправлено · ~248 клиентов');
+    document.getElementById('broadcastText').value = '';
+    updateBroadcastCount();
+  }, 1500);
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.innerHTML = '<span class="dot free"></span>' + msg;
+  toast.classList.add('show');
+  setTimeout(()=> toast.classList.remove('show'), 2600);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderClientStep();
+  log('app_initialized');
+});
+</script>
+</body>
 </html>
